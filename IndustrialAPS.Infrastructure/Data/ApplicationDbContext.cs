@@ -5,18 +5,18 @@ namespace IndustrialAPS.Infrastructure.Data
 {
     public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public ApplicationDbContext(
+            DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
-        // DbSets para cada entidade (tabelas)
         public DbSet<Product> Products { get; set; }
         public DbSet<Material> Materials { get; set; }
         public DbSet<BOMItem> BOMItems { get; set; }
-        public DbSet<IndustrialAPS.Domain.Entities.Machine> Machines { get; set; }
+        public DbSet<Machine> Machines { get; set; }
         public DbSet<MachineConnection> MachineConnections { get; set; }
-        public DbSet<IndustrialAPS.Domain.Entities.Operation> Operations { get; set; }
+        public DbSet<Operation> Operations { get; set; }
         public DbSet<MachineOperation> MachineOperations { get; set; }
         public DbSet<ProductionOrder> ProductionOrders { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
@@ -25,13 +25,68 @@ namespace IndustrialAPS.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configuração da chave composta para MachineOperation (N:N)
+            // -------------------------
+            // ÍNDICES ÚNICOS
+            // -------------------------
+
+            modelBuilder.Entity<Product>()
+                .HasIndex(p => p.Code)
+                .IsUnique();
+
+            modelBuilder.Entity<Material>()
+                .HasIndex(m => m.Code)
+                .IsUnique();
+
+            modelBuilder.Entity<Machine>()
+                .HasIndex(m => m.Code)
+                .IsUnique();
+
+
+            // -------------------------
+            // PRECISÃO DOS DECIMAIS
+            // -------------------------
+
+            modelBuilder.Entity<BOMItem>()
+                .Property(b => b.Quantity)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Material>()
+                .Property(m => m.Stock)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Machine>()
+                .Property(m => m.Capacity)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<MachineConnection>()
+                .Property(mc => mc.Weight)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Operation>()
+                .Property(o => o.Duration)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<ProductionOrder>()
+                .Property(po => po.Quantity)
+                .HasPrecision(18, 2);
+
+
+            // -------------------------
+            // MACHINE OPERATION N:N
+            // -------------------------
+
             modelBuilder.Entity<MachineOperation>()
-                .HasKey(mo => new { mo.MachineId, mo.OperationId });
+                .HasKey(mo => new
+                {
+                    mo.MachineId,
+                    mo.OperationId
+                });
 
-            // --- Configurações de Relacionamentos para evitar múltiplos caminhos em cascata ---
 
-            // 1. Configuração do relacionamento Machine -> MachineConnection
+            // -------------------------
+            // CONEXÕES ENTRE MÁQUINAS
+            // -------------------------
+
             modelBuilder.Entity<MachineConnection>()
                 .HasOne(mc => mc.FromMachine)
                 .WithMany(m => m.Connections)
@@ -44,7 +99,11 @@ namespace IndustrialAPS.Infrastructure.Data
                 .HasForeignKey(mc => mc.ToMachineId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // 2. Configuração para evitar múltiplos caminhos em cascata na tabela Schedules
+
+            // -------------------------
+            // SCHEDULE
+            // -------------------------
+
             modelBuilder.Entity<Schedule>()
                 .HasOne(s => s.Order)
                 .WithMany(o => o.Schedules)
@@ -63,7 +122,11 @@ namespace IndustrialAPS.Infrastructure.Data
                 .HasForeignKey(s => s.MachineId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // 🔽 NOVO: Configuração do relacionamento BOMItem -> Material
+
+            // -------------------------
+            // BOM
+            // -------------------------
+
             modelBuilder.Entity<BOMItem>()
                 .HasOne(b => b.Material)
                 .WithMany(m => m.BOMItems)

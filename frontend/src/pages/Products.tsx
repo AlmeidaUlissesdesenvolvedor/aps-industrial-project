@@ -136,8 +136,11 @@ const Products = () => {
         });
       }
 
-      closeModal();
+      setModalOpen(false);
+      setEditingProduct(null);
+      setForm(initialForm);
       await loadProducts();
+      
     } catch (error) {
       console.error('Erro ao salvar produto:', error);
       alert('Não foi possível salvar o produto.');

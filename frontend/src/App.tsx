@@ -4,6 +4,7 @@ import MainLayout from './layouts/MainLayout';
 
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
+import Materials from './pages/Materials';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
@@ -15,6 +16,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/materials" element={<Materials />} />
         </Route>
       </Routes>
     </BrowserRouter>
