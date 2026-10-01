@@ -21,7 +21,8 @@ namespace IndustrialAPS.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetBOMItems()
         {
-            return await _context.BOMItems
+            var items = await _context.BOMItems
+                .AsNoTracking()
                 .Select(b => new
                 {
                     b.Id,
@@ -29,9 +30,13 @@ namespace IndustrialAPS.API.Controllers
                     ProductName = b.Product.Name,
                     b.ComponentId,
                     MaterialName = b.Material.Name,
+                    MaterialCode = b.Material.Code,
+                    MaterialUnit = b.Material.Unit,
                     b.Quantity
                 })
                 .ToListAsync();
+
+            return Ok(items);
         }
 
         // GET: api/bomitems/5
@@ -39,6 +44,7 @@ namespace IndustrialAPS.API.Controllers
         public async Task<ActionResult<object>> GetBOMItem(int id)
         {
             var bomItem = await _context.BOMItems
+                .AsNoTracking()
                 .Where(b => b.Id == id)
                 .Select(b => new
                 {
@@ -47,34 +53,99 @@ namespace IndustrialAPS.API.Controllers
                     ProductName = b.Product.Name,
                     b.ComponentId,
                     MaterialName = b.Material.Name,
+                    MaterialCode = b.Material.Code,
+                    MaterialUnit = b.Material.Unit,
                     b.Quantity
                 })
                 .FirstOrDefaultAsync();
 
             if (bomItem == null)
             {
-                return NotFound();
+                return NotFound(
+                    $"Item BOM com ID {id} não encontrado."
+                );
             }
 
-            return bomItem;
+            return Ok(bomItem);
+        }
+
+        // GET: api/bomitems/product/1
+        [HttpGet("product/{productId}")]
+        public async Task<ActionResult<IEnumerable<object>>> GetBOMByProduct(
+            int productId
+        )
+        {
+            var productExists = await _context.Products
+                .AnyAsync(p => p.Id == productId);
+
+            if (!productExists)
+            {
+                return NotFound(
+                    $"Produto com ID {productId} não encontrado."
+                );
+            }
+
+            var items = await _context.BOMItems
+                .AsNoTracking()
+                .Where(b => b.ProductId == productId)
+                .Select(b => new
+                {
+                    b.Id,
+                    b.ProductId,
+                    ProductName = b.Product.Name,
+                    b.ComponentId,
+                    MaterialName = b.Material.Name,
+                    MaterialCode = b.Material.Code,
+                    MaterialUnit = b.Material.Unit,
+                    b.Quantity
+                })
+                .ToListAsync();
+
+            return Ok(items);
         }
 
         // POST: api/bomitems
         [HttpPost]
         public async Task<IActionResult> PostBOMItem(BOMItemDto dto)
         {
-            // Verificar se o produto existe
-            var product = await _context.Products.FindAsync(dto.ProductId);
-            if (product == null)
+            if (dto.Quantity <= 0)
             {
-                return BadRequest($"Produto com ID {dto.ProductId} não encontrado.");
+                return BadRequest(
+                    "A quantidade deve ser maior que zero."
+                );
             }
 
-            // Verificar se o material existe
-            var material = await _context.Materials.FindAsync(dto.ComponentId);
+            var product = await _context.Products
+                .FindAsync(dto.ProductId);
+
+            if (product == null)
+            {
+                return BadRequest(
+                    $"Produto com ID {dto.ProductId} não encontrado."
+                );
+            }
+
+            var material = await _context.Materials
+                .FindAsync(dto.ComponentId);
+
             if (material == null)
             {
-                return BadRequest($"Material com ID {dto.ComponentId} não encontrado.");
+                return BadRequest(
+                    $"Material com ID {dto.ComponentId} não encontrado."
+                );
+            }
+
+            var alreadyExists = await _context.BOMItems
+                .AnyAsync(b =>
+                    b.ProductId == dto.ProductId &&
+                    b.ComponentId == dto.ComponentId
+                );
+
+            if (alreadyExists)
+            {
+                return BadRequest(
+                    "Este material já está cadastrado na BOM deste produto."
+                );
             }
 
             var bomItem = new BOMItem
@@ -85,37 +156,112 @@ namespace IndustrialAPS.API.Controllers
             };
 
             _context.BOMItems.Add(bomItem);
+
             await _context.SaveChangesAsync();
 
-            return Ok(new
+            return CreatedAtAction(
+                nameof(GetBOMItem),
+                new { id = bomItem.Id },
+                new
+                {
+                    bomItem.Id,
+                    bomItem.ProductId,
+                    ProductName = product.Name,
+                    bomItem.ComponentId,
+                    MaterialName = material.Name,
+                    MaterialCode = material.Code,
+                    MaterialUnit = material.Unit,
+                    bomItem.Quantity
+                }
+            );
+        }
+
+        // PUT: api/bomitems/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutBOMItem(
+            int id,
+            BOMItemDto dto
+        )
+        {
+            if (dto.Quantity <= 0)
             {
-                Message = "BOMItem criado com sucesso!",
-                bomItem.Id,
-                bomItem.ProductId,
-                bomItem.ComponentId,
-                bomItem.Quantity
-            });
+                return BadRequest(
+                    "A quantidade deve ser maior que zero."
+                );
+            }
+
+            var bomItem = await _context.BOMItems
+                .FindAsync(id);
+
+            if (bomItem == null)
+            {
+                return NotFound(
+                    $"Item BOM com ID {id} não encontrado."
+                );
+            }
+
+            var productExists = await _context.Products
+                .AnyAsync(p => p.Id == dto.ProductId);
+
+            if (!productExists)
+            {
+                return BadRequest(
+                    $"Produto com ID {dto.ProductId} não encontrado."
+                );
+            }
+
+            var materialExists = await _context.Materials
+                .AnyAsync(m => m.Id == dto.ComponentId);
+
+            if (!materialExists)
+            {
+                return BadRequest(
+                    $"Material com ID {dto.ComponentId} não encontrado."
+                );
+            }
+
+            var duplicate = await _context.BOMItems
+                .AnyAsync(b =>
+                    b.Id != id &&
+                    b.ProductId == dto.ProductId &&
+                    b.ComponentId == dto.ComponentId
+                );
+
+            if (duplicate)
+            {
+                return BadRequest(
+                    "Este material já está cadastrado na BOM deste produto."
+                );
+            }
+
+            bomItem.ProductId = dto.ProductId;
+            bomItem.ComponentId = dto.ComponentId;
+            bomItem.Quantity = dto.Quantity;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         // DELETE: api/bomitems/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBOMItem(int id)
         {
-            var bomItem = await _context.BOMItems.FindAsync(id);
+            var bomItem = await _context.BOMItems
+                .FindAsync(id);
+
             if (bomItem == null)
             {
-                return NotFound();
+                return NotFound(
+                    $"Item BOM com ID {id} não encontrado."
+                );
             }
 
             _context.BOMItems.Remove(bomItem);
+
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool BOMItemExists(int id)
-        {
-            return _context.BOMItems.Any(e => e.Id == id);
         }
     }
 }

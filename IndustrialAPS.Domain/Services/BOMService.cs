@@ -5,38 +5,79 @@ namespace IndustrialAPS.Domain.Services
 {
     public class BOMService
     {
-        // Monta a árvore BOM a partir de um produto e uma lista de BOMItems
-        public BOMTree BuildBOMTree(Product product, List<BOMItem> allBomItems, List<Material> allMaterials)
+        public BOMTree BuildBOMTree(
+            Product product,
+            List<BOMItem> allBomItems,
+            List<Material> allMaterials
+        )
         {
-            var root = new BOMTreeNode(product.Id, product.Name, 1);
-            BuildChildren(root, product.Id, allBomItems, allMaterials);
+            var root = new BOMTreeNode(
+                product.Id,
+                product.Name,
+                1
+            );
+
+            var materialsById = allMaterials
+                .ToDictionary(m => m.Id);
+
+            BuildChildren(
+                root,
+                product.Id,
+                allBomItems,
+                materialsById
+            );
+
             return new BOMTree(root);
         }
 
-        private void BuildChildren(BOMTreeNode parentNode, int productId, List<BOMItem> allBomItems, List<Material> allMaterials)
+        private void BuildChildren(
+            BOMTreeNode parentNode,
+            int productId,
+            List<BOMItem> allBomItems,
+            Dictionary<int, Material> materialsById
+        )
         {
-            // Pega todos os itens de BOM que pertencem a este produto
-            var bomItems = allBomItems.Where(b => b.ProductId == productId).ToList();
+            var bomItems = allBomItems
+                .Where(b => b.ProductId == productId)
+                .ToList();
 
             foreach (var item in bomItems)
             {
-                // Tenta encontrar o material correspondente
-                var material = allMaterials.FirstOrDefault(m => m.Id == item.ComponentId);
-
-                if (material != null)
+                if (
+                    materialsById.TryGetValue(
+                        item.ComponentId,
+                        out var material
+                    )
+                )
                 {
-                    // É um material folha
-                    var childNode = new BOMTreeNode(material.Id, material.Name, item.Quantity);
+                    var childNode = new BOMTreeNode(
+                        material.Id,
+                        material.Name,
+                        item.Quantity
+                    );
+
                     parentNode.AddChild(childNode);
                 }
-                // Se não for material, pode ser um subproduto (não implementado nesta versão simplificada)
             }
         }
 
-        // Calcula os requisitos de material para uma quantidade de produção
-        public Dictionary<string, decimal> CalculateMaterialRequirements(BOMTree tree, decimal productionQuantity)
+        public Dictionary<string, decimal>
+            CalculateMaterialRequirements(
+                BOMTree tree,
+                decimal productionQuantity
+            )
         {
-            return tree.CalculateMaterialRequirements(productionQuantity);
+            if (productionQuantity <= 0)
+            {
+                throw new ArgumentException(
+                    "A quantidade de produção deve ser maior que zero.",
+                    nameof(productionQuantity)
+                );
+            }
+
+            return tree.CalculateMaterialRequirements(
+                productionQuantity
+            );
         }
     }
 }
