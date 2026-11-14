@@ -2,15 +2,17 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import MainLayout from './layouts/MainLayout';
 
-// Página responsável pelo CRUD das operações industriais
-import Operations from './pages/Operations';
+
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Materials from './pages/Materials';
 import BOM from './pages/BOM';
 import ModulePlaceholder from './pages/ModulePlaceholder';
 import Machines from './pages/Machines';
-
+// Página responsável pelo CRUD das operações industriais
+import Operations from './pages/Operations';
+// Página responsável por associar máquinas às operações produtivas
+import MachineOperations from './pages/MachineOperations';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -78,6 +80,16 @@ function App() {
           <Route
             path="/operations"
             element={<Operations />}
+          />
+
+          
+          {/*  Associação Máquina x Operação.
+            Essa tela define quais máquinas são capazes
+            de executar determinada operação produtiva.
+          */}
+          <Route
+            path="/machine-operations"
+            element={<MachineOperations />}
           />
 
           {/* ORDENS DE PRODUÇÃO */}

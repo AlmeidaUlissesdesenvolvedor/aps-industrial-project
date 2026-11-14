@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+
 import {
   Boxes,
   CalendarDays,
@@ -7,16 +8,32 @@ import {
   Gauge,
   GitBranch,
   Layers3,
+  Link2,
   Package,
   Route,
   Settings,
   Wrench,
 } from 'lucide-react';
 
+/*
+ * Sidebar principal do APS Industrial.
+ *
+ * Responsável pela navegação entre os módulos do sistema.
+ *
+ * Cada NavLink aponta para uma rota cadastrada no App.tsx.
+ *
+ * O React Router informa automaticamente se a rota está ativa,
+ * permitindo destacar visualmente o item selecionado.
+ */
 const Sidebar = () => {
   return (
     <aside className="sidebar">
+
+      {/* =====================================================
+          IDENTIFICAÇÃO DO SISTEMA
+         ===================================================== */}
       <div className="sidebar-brand">
+
         <div className="brand-icon">
           <Factory size={24} />
         </div>
@@ -25,11 +42,23 @@ const Sidebar = () => {
           <strong>APS Industrial</strong>
           <span>Produção inteligente</span>
         </div>
+
       </div>
 
+      {/* =====================================================
+          NAVEGAÇÃO PRINCIPAL
+         ===================================================== */}
       <nav className="sidebar-navigation">
-        <span className="sidebar-section-title">VISÃO GERAL</span>
 
+        {/* =====================================================
+            VISÃO GERAL
+           ===================================================== */}
+
+        <span className="sidebar-section-title">
+          VISÃO GERAL
+        </span>
+
+        {/* Dashboard principal */}
         <NavLink
           to="/"
           end
@@ -41,8 +70,15 @@ const Sidebar = () => {
           Dashboard
         </NavLink>
 
-        <span className="sidebar-section-title">PLANEJAMENTO</span>
+        {/* =====================================================
+            PLANEJAMENTO
+           ===================================================== */}
 
+        <span className="sidebar-section-title">
+          PLANEJAMENTO
+        </span>
+
+        {/* Planejamento da produção */}
         <NavLink
           to="/planning"
           className={({ isActive }) =>
@@ -53,6 +89,7 @@ const Sidebar = () => {
           Planejamento
         </NavLink>
 
+        {/* Programação das operações e máquinas */}
         <NavLink
           to="/schedules"
           className={({ isActive }) =>
@@ -63,8 +100,15 @@ const Sidebar = () => {
           Programação
         </NavLink>
 
-        <span className="sidebar-section-title">PRODUÇÃO</span>
+        {/* =====================================================
+            PRODUÇÃO
+           ===================================================== */}
 
+        <span className="sidebar-section-title">
+          PRODUÇÃO
+        </span>
+
+        {/* Cadastro dos produtos fabricados */}
         <NavLink
           to="/products"
           className={({ isActive }) =>
@@ -75,6 +119,7 @@ const Sidebar = () => {
           Produtos
         </NavLink>
 
+        {/* Cadastro das matérias-primas e componentes */}
         <NavLink
           to="/materials"
           className={({ isActive }) =>
@@ -85,6 +130,7 @@ const Sidebar = () => {
           Materiais
         </NavLink>
 
+        {/* Cadastro das máquinas da fábrica */}
         <NavLink
           to="/machines"
           className={({ isActive }) =>
@@ -95,6 +141,7 @@ const Sidebar = () => {
           Máquinas
         </NavLink>
 
+        {/* Cadastro das operações produtivas */}
         <NavLink
           to="/operations"
           className={({ isActive }) =>
@@ -105,6 +152,26 @@ const Sidebar = () => {
           Operações
         </NavLink>
 
+        {/*
+          Relacionamento Máquina x Operação.
+
+          Define quais máquinas são capazes
+          de executar determinada operação.
+
+          Esse relacionamento será usado posteriormente
+          pelo módulo de planejamento da produção.
+        */}
+        <NavLink
+          to="/machine-operations"
+          className={({ isActive }) =>
+            `sidebar-link ${isActive ? 'active' : ''}`
+          }
+        >
+          <Link2 size={19} />
+          Máquinas × Operações
+        </NavLink>
+
+        {/* Ordens geradas pelo planejamento industrial */}
         <NavLink
           to="/production-orders"
           className={({ isActive }) =>
@@ -115,8 +182,20 @@ const Sidebar = () => {
           Ordens de Produção
         </NavLink>
 
-        <span className="sidebar-section-title">ESTRUTURA</span>
+        {/* =====================================================
+            ESTRUTURA
+           ===================================================== */}
 
+        <span className="sidebar-section-title">
+          ESTRUTURA
+        </span>
+
+        {/*
+          BOM - Bill of Materials.
+
+          Representa a estrutura hierárquica do produto
+          utilizando a estrutura de dados Árvore.
+        */}
         <NavLink
           to="/bom"
           className={({ isActive }) =>
@@ -127,6 +206,12 @@ const Sidebar = () => {
           Estrutura BOM
         </NavLink>
 
+        {/*
+          Conexões entre máquinas.
+
+          Essas conexões serão utilizadas para construir
+          o Grafo da fábrica.
+        */}
         <NavLink
           to="/connections"
           className={({ isActive }) =>
@@ -136,15 +221,20 @@ const Sidebar = () => {
           <GitBranch size={19} />
           Conexões
         </NavLink>
+
       </nav>
+
+      {/* =====================================================
+          RODAPÉ
+         ===================================================== */}
 
       <div className="sidebar-footer">
         APS Industrial
         <span>v1.0</span>
       </div>
+
     </aside>
   );
 };
 
 export default Sidebar;
-
