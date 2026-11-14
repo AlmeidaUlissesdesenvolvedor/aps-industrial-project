@@ -2,20 +2,27 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import MainLayout from './layouts/MainLayout';
 
-
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Materials from './pages/Materials';
 import BOM from './pages/BOM';
 import ModulePlaceholder from './pages/ModulePlaceholder';
 import Machines from './pages/Machines';
-// Página responsável pelo CRUD das operações industriais
+
+// Página responsável pelo CRUD das operações industriais.
 import Operations from './pages/Operations';
-// Página responsável por associar máquinas às operações produtivas
+
+// Página responsável por associar máquinas às operações produtivas.
 import MachineOperations from './pages/MachineOperations';
+
 // Página responsável pelas conexões entre máquinas.
 // Essas conexões formarão as arestas do Grafo da fábrica.
 import Connections from './pages/Connections';
+
+// Página responsável pela visualização do Grafo
+// e execução dos algoritmos BFS, DFS e Dijkstra.
+import Graph from './pages/Graph';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -24,33 +31,49 @@ function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* Todas as páginas abaixo usam o layout principal */}
+        {/*
+          Todas as páginas abaixo utilizam o MainLayout.
+
+          Isso mantém Sidebar, conteúdo principal
+          e estrutura visual iguais em todo o sistema.
+        */}
         <Route element={<MainLayout />}>
 
-          {/* VISÃO GERAL */}
+          {/* ==============================
+              VISÃO GERAL
+              ============================== */}
           <Route
             path="/"
             element={<Dashboard />}
           />
 
-          {/* PRODUÇÃO */}
+          {/* ==============================
+              PRODUTOS
+              ============================== */}
           <Route
             path="/products"
             element={<Products />}
           />
 
+          {/* ==============================
+              MATERIAIS
+              ============================== */}
           <Route
             path="/materials"
             element={<Materials />}
           />
 
-          {/* ESTRUTURA BOM */}
+          {/* ==============================
+              BOM
+              ============================== */}
           <Route
             path="/bom"
             element={<BOM />}
           />
 
-          {/* PLANEJAMENTO */}
+          {/* ==============================
+              PLANEJAMENTO
+              ============================== */}
           <Route
             path="/planning"
             element={
@@ -62,7 +85,9 @@ function App() {
             }
           />
 
-          {/* PROGRAMAÇÃO */}
+          {/* ==============================
+              PROGRAMAÇÃO
+              ============================== */}
           <Route
             path="/schedules"
             element={
@@ -73,29 +98,34 @@ function App() {
               />
             }
           />
-        
+
+          {/* ==============================
+              MÁQUINAS
+              ============================== */}
           <Route
             path="/machines"
             element={<Machines />}
           />
 
-          {/* Tela funcional de operações */}
+          {/* ==============================
+              OPERAÇÕES
+              ============================== */}
           <Route
             path="/operations"
             element={<Operations />}
           />
 
-          
-          {/*  Associação Máquina x Operação.
-            Essa tela define quais máquinas são capazes
-            de executar determinada operação produtiva.
-          */}
+          {/* ==============================
+              MÁQUINAS X OPERAÇÕES
+              ============================== */}
           <Route
             path="/machine-operations"
             element={<MachineOperations />}
           />
 
-          {/* ORDENS DE PRODUÇÃO */}
+          {/* ==============================
+              ORDENS DE PRODUÇÃO
+              ============================== */}
           <Route
             path="/production-orders"
             element={
@@ -107,16 +137,22 @@ function App() {
             }
           />
 
-          {/*
-            Conexões entre máquinas.
-
-            Cada máquina será um vértice do Grafo
-            e cada conexão cadastrada será uma aresta.
-          */}
+          {/* ==============================
+              CONEXÕES ENTRE MÁQUINAS
+              ============================== */}
           <Route
             path="/connections"
             element={<Connections />}
           />
+
+          {/* ==============================
+              GRAFO INDUSTRIAL
+              ============================== */}
+          <Route
+            path="/graph"
+            element={<Graph />}
+          />
+
         </Route>
 
       </Routes>

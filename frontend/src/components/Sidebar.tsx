@@ -209,8 +209,8 @@ const Sidebar = () => {
         {/*
           Conexões entre máquinas.
 
-          Essas conexões serão utilizadas para construir
-          o Grafo da fábrica.
+          Cada conexão cadastrada representa uma
+          aresta do Grafo Industrial.
         */}
         <NavLink
           to="/connections"
@@ -218,8 +218,27 @@ const Sidebar = () => {
             `sidebar-link ${isActive ? 'active' : ''}`
           }
         >
-          <GitBranch size={19} />
+          <Link2 size={19} />
           Conexões
+        </NavLink>
+
+        {/*
+          Grafo Industrial.
+
+          Exibe as máquinas como vértices e as conexões
+          como arestas.
+
+          Também permite visualizar e executar
+          os algoritmos BFS, DFS e Dijkstra.
+        */}
+        <NavLink
+          to="/graph"
+          className={({ isActive }) =>
+            `sidebar-link ${isActive ? 'active' : ''}`
+          }
+        >
+          <GitBranch size={19} />
+          Grafo
         </NavLink>
 
       </nav>
