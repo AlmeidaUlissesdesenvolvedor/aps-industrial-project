@@ -2,11 +2,14 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import MainLayout from './layouts/MainLayout';
 
+// Página responsável pelo CRUD das operações industriais
+import Operations from './pages/Operations';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Materials from './pages/Materials';
 import BOM from './pages/BOM';
 import ModulePlaceholder from './pages/ModulePlaceholder';
+import Machines from './pages/Machines';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
@@ -65,29 +68,16 @@ function App() {
               />
             }
           />
-
-          {/* MÁQUINAS */}
+        
           <Route
             path="/machines"
-            element={
-              <ModulePlaceholder
-                title="Máquinas"
-                description="Cadastro e gerenciamento dos recursos industriais."
-                nextStep="Integrar cadastro de máquinas, capacidade, status e operações executáveis."
-              />
-            }
+            element={<Machines />}
           />
 
-          {/* OPERAÇÕES */}
+          {/* Tela funcional de operações */}
           <Route
             path="/operations"
-            element={
-              <ModulePlaceholder
-                title="Operações"
-                description="Operações necessárias para fabricação dos produtos."
-                nextStep="Associar operações aos produtos e às máquinas disponíveis."
-              />
-            }
+            element={<Operations />}
           />
 
           {/* ORDENS DE PRODUÇÃO */}
