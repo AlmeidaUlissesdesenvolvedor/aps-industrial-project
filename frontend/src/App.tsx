@@ -13,6 +13,9 @@ import Machines from './pages/Machines';
 import Operations from './pages/Operations';
 // Página responsável por associar máquinas às operações produtivas
 import MachineOperations from './pages/MachineOperations';
+// Página responsável pelas conexões entre máquinas.
+// Essas conexões formarão as arestas do Grafo da fábrica.
+import Connections from './pages/Connections';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -104,18 +107,16 @@ function App() {
             }
           />
 
-          {/* CONEXÕES / GRAFO */}
+          {/*
+            Conexões entre máquinas.
+
+            Cada máquina será um vértice do Grafo
+            e cada conexão cadastrada será uma aresta.
+          */}
           <Route
             path="/connections"
-            element={
-              <ModulePlaceholder
-                title="Conexões"
-                description="Rede de conexões entre máquinas."
-                nextStep="Visualizar o grafo e integrar BFS, DFS e Dijkstra ao planejamento."
-              />
-            }
+            element={<Connections />}
           />
-
         </Route>
 
       </Routes>
