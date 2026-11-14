@@ -5,6 +5,7 @@ import MainLayout from './layouts/MainLayout';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Materials from './pages/Materials';
+import Planning from './pages/Planning';
 import BOM from './pages/BOM';
 import ModulePlaceholder from './pages/ModulePlaceholder';
 import Machines from './pages/Machines';
@@ -74,17 +75,12 @@ function App() {
           {/* ==============================
               PLANEJAMENTO
               ============================== */}
+          {/* Planejamento integrado da produção */}
           <Route
             path="/planning"
-            element={
-              <ModulePlaceholder
-                title="Planejamento"
-                description="Planejamento da produção industrial."
-                nextStep="Integrar BOM, operações, máquinas, grafo e geração de ordens de produção."
-              />
-            }
+            element={<Planning />}
           />
-
+            
           {/* ==============================
               PROGRAMAÇÃO
               ============================== */}
