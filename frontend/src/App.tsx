@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Materials from './pages/Materials';
 import Planning from './pages/Planning';
+import ProductionOrders from './pages/ProductionOrders';
 import BOM from './pages/BOM';
 import ModulePlaceholder from './pages/ModulePlaceholder';
 import Machines from './pages/Machines';
@@ -122,15 +123,10 @@ function App() {
           {/* ==============================
               ORDENS DE PRODUÇÃO
               ============================== */}
+          {/* Ordens geradas pelo Planejamento */}
           <Route
             path="/production-orders"
-            element={
-              <ModulePlaceholder
-                title="Ordens de Produção"
-                description="Gerenciamento das ordens planejadas."
-                nextStep="Integrar as ordens geradas pelo módulo de planejamento."
-              />
-            }
+            element={<ProductionOrders />}
           />
 
           {/* ==============================
